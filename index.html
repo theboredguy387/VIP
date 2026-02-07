@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eclipse</title>
     <style>
+        /* --- CSS: THE LOOK & THE PULSE --- */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
         :root {
@@ -23,23 +24,15 @@
             overflow: hidden;
         }
 
-        /* --- LOGIN SCREEN --- */
+        /* LOCK SCREEN */
         #lock-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--bg);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 10000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10000;
         }
 
-        .logo-container {
-            width: 280px; height: 280px;
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        /* THE PULSING LOGO - Pointing to your local GitHub file */
+        .logo-container { width: 280px; height: 280px; margin-bottom: 40px; }
+        
         .logo-img {
             width: 100%; height: 100%;
             background: url('logo.png') no-repeat center;
@@ -54,77 +47,33 @@
         }
 
         #pass-input {
-            background: transparent;
-            border: none;
+            background: transparent; border: none;
             border-bottom: 2px solid var(--blood-red);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-size: 1.1rem;
-            text-align: center;
-            padding: 10px;
-            width: 220px;
-            outline: none;
-            transition: 0.3s;
+            color: white; font-size: 1.1rem; text-align: center;
+            padding: 10px; width: 220px; outline: none; transition: 0.3s;
         }
-
-        #pass-input::placeholder { color: #333; }
         #pass-input:focus { width: 280px; border-bottom-color: white; }
 
-        /* --- MAIN UI --- */
+        /* MAIN INTERFACE */
         #main-ui { display: none; height: 100vh; }
-
         #sidebar {
-            width: 240px;
-            background: var(--sidebar);
-            border-right: 1px solid #111;
-            display: flex; flex-direction: column;
+            width: 240px; background: var(--sidebar);
+            border-right: 1px solid #111; display: flex; flex-direction: column;
             padding: 30px 20px;
         }
-
-        .sidebar-logo {
-            font-size: 1.4rem; font-weight: bold; color: white;
-            margin-bottom: 40px; letter-spacing: 2px;
-        }
-
         .nav-item {
-            padding: 12px; color: #444;
-            cursor: pointer; transition: 0.2s;
-            border-radius: 4px; margin-bottom: 5px;
-            font-weight: bold; font-size: 0.9rem;
+            padding: 12px; color: #444; cursor: pointer; border-radius: 4px; 
+            margin-bottom: 5px; font-weight: bold; transition: 0.2s;
         }
-
         .nav-item:hover, .nav-item.active { color: white; background: #111; }
         #hrm-btn { color: var(--blood-red); display: none; margin-top: auto; border: 1px solid var(--blood-red); text-align: center; }
 
         #viewport { flex: 1; padding: 40px; overflow-y: auto; }
-
-        /* LIBRARY GRID */
-        .library-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .game-card {
-            background: var(--card);
-            border: 1px solid #1a1a1a;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .game-icon {
-            width: 60px; height: 60px;
-            border-radius: 50%; margin: 0 auto 15px;
-            background: #222; background-size: cover;
-        }
-
-        .dl-btn {
-            display: block; background: var(--blood-red); color: white;
-            padding: 10px; border-radius: 4px; text-decoration: none;
-            font-weight: bold; margin-top: 15px; font-size: 0.8rem;
-        }
-
+        .library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        .game-card { background: var(--card); border: 1px solid #1a1a1a; padding: 20px; border-radius: 8px; text-align: center; }
+        .game-icon { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px; background: #222; background-size: cover; }
+        .dl-btn { display: block; background: var(--blood-red); color: white; padding: 10px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 15px; }
         .dl-btn:hover { background: white; color: black; }
 
         .hidden { display: none !important; }
@@ -140,40 +89,42 @@
 
     <div id="main-ui">
         <div id="sidebar">
-            <div class="sidebar-logo">ECLIPSE</div>
+            <div style="font-size: 1.4rem; font-weight: bold; color: white; margin-bottom: 40px; letter-spacing: 2px;">ECLIPSE</div>
             <div class="nav-item active" onclick="showTab('dashboard')">LIBRARY</div>
-            <div class="nav-item" onclick="showTab('dashboard')">EXTENSIONS</div>
+            <div class="nav-item" onclick="window.open('https://docs.google.com/document/d/e/2PACX-1vQ8euIQpVS_H2y5t5QCF3y7c_s2rnDcvbQZYeEjX7Fdkz8_nIu_fSJoa3N4S4fVN_Ubaqs-D5UIOt4U/pub')">SUPPORT</div>
             <div id="hrm-btn" class="nav-item" onclick="showTab('hrm')">HRM PANEL</div>
         </div>
 
         <div id="viewport">
             <div id="dashboard-tab">
                 <h1 style="margin:0;">Library</h1>
-                <p style="color: #333; margin-bottom: 30px;">Authorized Session</p>
+                <p style="color: #333; margin-bottom: 30px;">Authorized Access Only</p>
                 <div class="library-grid" id="game-list"></div>
             </div>
 
             <div id="hrm-tab" class="hidden">
                 <h1>HRM Control</h1>
-                <div class="game-card" style="text-align: left;">
-                    <p>Total Hits: <span id="hit-count" style="color: var(--blood-red);">0</span></p>
-                    <button onclick="localStorage.clear(); location.reload();" style="color:red; background:none; border:1px solid red; padding:10px; cursor:pointer;">FORCE LOGOUT ALL</button>
+                <div class="game-card" style="text-align: left; max-width: 400px;">
+                    <p>Device Authorized: <span style="color: #0f0;">YES</span></p>
+                    <p>Hits: <span id="hit-count" style="color: var(--blood-red);">0</span></p>
+                    <button onclick="localStorage.clear(); location.reload();" style="color:red; background:none; border:1px solid red; padding:10px; cursor:pointer; font-weight:bold; width: 100%;">GLOBAL NUKE (LOGOUT ALL)</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        /* --- JAVASCRIPT: THE BRAIN & THE SCRUBBER --- */
         const BRAIN_URL = "https://docs.google.com/document/d/e/2PACX-1vQ8euIQpVS_H2y5t5QCF3y7c_s2rnDcvbQZYeEjX7Fdkz8_nIu_fSJoa3N4S4fVN_Ubaqs-D5UIOt4U/pub";
 
-        // ADD YOUR GAMES HERE
+        // ADD YOUR GAMES HERE (Name, Icon, Link)
         const GAMES = [
-            { name: "GD 2.2074 Vanilla", icon: "logo.png", link: "PASTE_YOUR_ONEDRIVE_DIRECT_LINK_HERE" }
+            { name: "GD 2.2074 Vanilla", icon: "logo.png", link: "https://onedrive.live.com/download?resid=0F96DD6E92BC1A64!105&authkey=!AI-XYm0Zbe0F1kY" }
         ];
 
         const input = document.getElementById('pass-input');
         
-        // CHECK SAVED ACCESS
+        // CHECK FOR SAVED "TICKET"
         if (localStorage.getItem('eclipse_auth') === 'true') {
             unlock(localStorage.getItem('eclipse_role'));
         }
@@ -181,21 +132,22 @@
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
                 const val = input.value;
-                document.getElementById('status').innerText = "Authenticating...";
+                document.getElementById('status').innerText = "Scrubbing Brain...";
                 
                 try {
-                    // Cache-busting fetch to get the LATEST version of your Google Doc
-                    const response = await fetch(BRAIN_URL + "?t=" + new Date().getTime());
+                    const response = await fetch(BRAIN_URL + "?nocache=" + new Date().getTime());
                     const html = await response.text();
                     
-                    // Improved parsing for Google Doc 'Plain Text'
-                    const temp = document.createElement('div');
-                    temp.innerHTML = html;
-                    const cleanText = temp.innerText || temp.textContent;
-                    const lines = cleanText.split(/\s+/).filter(l => l.length > 0);
+                    // THE SCRUBBER: Removes Google's hidden HTML tags to find your passwords
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const cleanText = doc.body.innerText || doc.body.textContent;
                     
-                    const ownerPass = lines[0];
-                    const userPass = lines[1];
+                    // Split into lines and remove empty spaces
+                    const lines = cleanText.split(/\s+/).filter(line => line.length > 0);
+                    
+                    const ownerPass = lines[0]; // Line 1
+                    const userPass = lines[1];  // Line 2
 
                     if (val === ownerPass) { unlock('owner'); }
                     else if (val === userPass) { unlock('user'); }
@@ -204,7 +156,7 @@
                         input.value = "";
                     }
                 } catch (err) {
-                    document.getElementById('status').innerText = "LINK ERROR";
+                    document.getElementById('status').innerText = "CONNECTION ERROR";
                 }
             }
         });
@@ -216,7 +168,7 @@
             document.getElementById('main-ui').style.display = 'flex';
             if (role === 'owner') document.getElementById('hrm-btn').style.display = 'block';
             
-            // Render Games
+            // Build Library
             document.getElementById('game-list').innerHTML = GAMES.map(g => `
                 <div class="game-card">
                     <div class="game-icon" style="background-image:url('${g.icon}')"></div>
@@ -224,6 +176,11 @@
                     <a href="${g.link}" class="dl-btn">DIRECT DOWNLOAD</a>
                 </div>
             `).join('');
+
+            // Simple hit counter logic
+            let hits = localStorage.getItem('eclipse_hits') || Math.floor(Math.random() * 10) + 1;
+            document.getElementById('hit-count').innerText = hits;
+            localStorage.setItem('eclipse_hits', parseInt(hits) + 1);
         }
 
         function showTab(t) {
