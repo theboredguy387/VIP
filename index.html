@@ -9,7 +9,6 @@
 
         :root {
             --blood-red: #8a0303;
-            --accent-glow: rgba(138, 3, 3, 0.6);
             --bg: #000000;
             --sidebar: #080808;
             --card: #0c0c0c;
@@ -32,53 +31,50 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 10000;
-            transition: opacity 0.5s ease;
         }
 
         .logo-container {
-            width: 300px; height: 300px;
+            width: 280px; height: 280px;
             position: relative;
             margin-bottom: 40px;
         }
 
-        /* THE PULSING LOGO */
+        /* THE PULSING LOGO - Pointing to your local GitHub file */
         .logo-img {
             width: 100%; height: 100%;
-            background: url('https://i.postimg.cc/mD8zM9nF/ECLIPSE-LOGO.png') no-repeat center;
+            background: url('logo.png') no-repeat center;
             background-size: contain;
-            filter: drop-shadow(0 0 10px var(--blood-red));
             animation: pulse 3s infinite ease-in-out;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); filter: drop-shadow(0 0 5px var(--blood-red)); }
-            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px var(--blood-red)); }
+            50% { transform: scale(1.04); filter: drop-shadow(0 0 30px var(--blood-red)); }
             100% { transform: scale(1); filter: drop-shadow(0 0 5px var(--blood-red)); }
         }
 
-        /* INPUT BOX (YOUR WAY) */
         #pass-input {
             background: transparent;
             border: none;
-            border-bottom: 1px solid var(--blood-red);
-            color: var(--blood-red);
+            border-bottom: 2px solid var(--blood-red);
+            color: white;
             font-family: 'Inter', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-align: center;
             padding: 10px;
-            width: 250px;
+            width: 220px;
             outline: none;
             transition: 0.3s;
         }
 
-        #pass-input::placeholder { color: #333; font-size: 0.9rem; }
-        #pass-input:focus { border-bottom: 1px solid white; color: white; width: 300px; }
+        #pass-input::placeholder { color: #333; }
+        #pass-input:focus { width: 280px; border-bottom-color: white; }
 
         /* --- MAIN UI --- */
-        #main-ui { display: flex; height: 100vh; visibility: hidden; }
+        #main-ui { display: none; height: 100vh; }
 
         #sidebar {
-            width: 260px;
+            width: 240px;
             background: var(--sidebar);
             border-right: 1px solid #111;
             display: flex; flex-direction: column;
@@ -86,219 +82,154 @@
         }
 
         .sidebar-logo {
-            font-size: 1.5rem; font-weight: bold; color: white;
-            margin-bottom: 50px; letter-spacing: 3px;
+            font-size: 1.4rem; font-weight: bold; color: white;
+            margin-bottom: 40px; letter-spacing: 2px;
         }
 
         .nav-item {
-            padding: 15px; color: #555;
-            cursor: pointer; transition: 0.3s;
+            padding: 12px; color: #444;
+            cursor: pointer; transition: 0.2s;
             border-radius: 4px; margin-bottom: 5px;
-            font-weight: bold;
+            font-weight: bold; font-size: 0.9rem;
         }
 
         .nav-item:hover, .nav-item.active { color: white; background: #111; }
         #hrm-btn { color: var(--blood-red); display: none; margin-top: auto; border: 1px solid var(--blood-red); text-align: center; }
-        #hrm-btn:hover { background: var(--blood-red); color: black; }
 
-        #viewport { flex: 1; padding: 60px; overflow-y: auto; }
+        #viewport { flex: 1; padding: 40px; overflow-y: auto; }
 
         /* LIBRARY GRID */
         .library-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
         }
 
         .game-card {
             background: var(--card);
             border: 1px solid #1a1a1a;
-            padding: 25px;
-            border-radius: 12px;
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-            transition: 0.3s;
         }
-
-        .game-card:hover { border-color: var(--blood-red); transform: translateY(-5px); }
 
         .game-icon {
-            width: 80px; height: 80px;
-            border-radius: 50%; margin: 0 auto 20px;
-            background-size: cover; border: 2px solid #222;
+            width: 60px; height: 60px;
+            border-radius: 50%; margin: 0 auto 15px;
+            background: #222; background-size: cover;
         }
 
-        .game-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; }
-        
         .dl-btn {
             display: block; background: var(--blood-red); color: white;
-            padding: 12px; border-radius: 6px; text-decoration: none;
-            font-weight: bold; margin-top: 20px; transition: 0.3s;
+            padding: 10px; border-radius: 4px; text-decoration: none;
+            font-weight: bold; margin-top: 15px; font-size: 0.8rem;
         }
 
-        .dl-btn:hover { background: white; color: black; box-shadow: 0 0 20px var(--accent-glow); }
+        .dl-btn:hover { background: white; color: black; }
 
-        /* HRM PANEL */
         .hidden { display: none !important; }
-        #hrm-panel h1 { color: var(--blood-red); }
-
-        .nuke-btn {
-            background: none; border: 1px solid #ff3300; color: #ff3300;
-            padding: 15px 30px; cursor: pointer; font-weight: bold; margin-top: 30px;
-        }
-        .nuke-btn:hover { background: #ff3300; color: white; }
-
     </style>
 </head>
 <body>
 
-    <!-- GHOST LOGIN -->
     <div id="lock-screen">
-        <div class="logo-container">
-            <div class="logo-img"></div>
-        </div>
+        <div class="logo-container"><div class="logo-img"></div></div>
         <input type="password" id="pass-input" placeholder="Enter here">
-        <p id="status" style="color: var(--blood-red); font-size: 0.8rem; margin-top: 20px;"></p>
+        <p id="status" style="color: var(--blood-red); font-size: 0.7rem; margin-top: 15px;"></p>
     </div>
 
-    <!-- MAIN APP -->
     <div id="main-ui">
         <div id="sidebar">
             <div class="sidebar-logo">ECLIPSE</div>
-            <div class="nav-item active" onclick="showTab('dashboard')">DASHBOARD</div>
-            <div class="nav-item" onclick="showTab('dashboard')">LIBRARY</div>
-            <div class="nav-item" onclick="window.open('https://docs.google.com/document/d/e/2PACX-1vQ8euIQpVS_H2y5t5QCF3y7c_s2rnDcvbQZYeEjX7Fdkz8_nIu_fSJoa3N4S4fVN_Ubaqs-D5UIOt4U/pub')">SUPPORT</div>
+            <div class="nav-item active" onclick="showTab('dashboard')">LIBRARY</div>
+            <div class="nav-item" onclick="showTab('dashboard')">EXTENSIONS</div>
             <div id="hrm-btn" class="nav-item" onclick="showTab('hrm')">HRM PANEL</div>
         </div>
 
         <div id="viewport">
-            <!-- DASHBOARD / LIBRARY -->
             <div id="dashboard-tab">
-                <h1 style="margin-top:0; letter-spacing: -1px;">Main Build Library</h1>
-                <p style="color: #444; margin-bottom: 40px;">Authenticated Session Active.</p>
-                
-                <div class="library-grid" id="game-list">
-                    <!-- GAMES INJECTED HERE -->
-                </div>
+                <h1 style="margin:0;">Library</h1>
+                <p style="color: #333; margin-bottom: 30px;">Authorized Session</p>
+                <div class="library-grid" id="game-list"></div>
             </div>
 
-            <!-- HRM PANEL -->
             <div id="hrm-tab" class="hidden">
-                <h1>HRM Control Center</h1>
-                <p>Manage access keys and monitor device hits.</p>
-                <div class="game-card" style="text-align: left; width: 100%; max-width: 500px;">
-                    <h3>System Status</h3>
-                    <p>Authorized Devices: <span id="hit-count" style="color: var(--blood-red);">0</span></p>
-                    <p>Brain Link: <span style="color: #00ff00;">ONLINE</span></p>
-                    <button class="nuke-btn" onclick="globalNuke()">GLOBAL RESET (NUKE)</button>
+                <h1>HRM Control</h1>
+                <div class="game-card" style="text-align: left;">
+                    <p>Total Hits: <span id="hit-count" style="color: var(--blood-red);">0</span></p>
+                    <button onclick="localStorage.clear(); location.reload();" style="color:red; background:none; border:1px solid red; padding:10px; cursor:pointer;">FORCE LOGOUT ALL</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
         const BRAIN_URL = "https://docs.google.com/document/d/e/2PACX-1vQ8euIQpVS_H2y5t5QCF3y7c_s2rnDcvbQZYeEjX7Fdkz8_nIu_fSJoa3N4S4fVN_Ubaqs-D5UIOt4U/pub";
 
-        // --- 2. GAME LIBRARY (Add Games Here) ---
+        // ADD YOUR GAMES HERE
         const GAMES = [
-            { 
-                name: "GD Mega Pack v2.2", 
-                icon: "https://i.postimg.cc/mD8zM9nF/ECLIPSE-LOGO.png", 
-                link: "https://onedrive.live.com/download?resid=0F96DD6E92BC1A64!105&authkey=!AI-XYm0Zbe0F1kY" 
-            },
-            { 
-                name: "Vanilla Assets", 
-                icon: "https://i.postimg.cc/mD8zM9nF/ECLIPSE-LOGO.png", 
-                link: "https://onedrive.live.com/download?resid=0F96DD6E92BC1A64!105&authkey=!AI-XYm0Zbe0F1kY" 
-            }
+            { name: "GD 2.2074 Vanilla", icon: "logo.png", link: "PASTE_YOUR_ONEDRIVE_DIRECT_LINK_HERE" }
         ];
 
-        // --- 3. SYSTEM LOGIC ---
         const input = document.getElementById('pass-input');
-        const lockScreen = document.getElementById('lock-screen');
-        const mainUI = document.getElementById('main-ui');
-        const hitDisplay = document.getElementById('hit-count');
-
-        // Check Local Storage for Ticket
+        
+        // CHECK SAVED ACCESS
         if (localStorage.getItem('eclipse_auth') === 'true') {
             unlock(localStorage.getItem('eclipse_role'));
         }
 
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
-                const pass = input.value;
-                document.getElementById('status').innerText = "Verifying link...";
+                const val = input.value;
+                document.getElementById('status').innerText = "Authenticating...";
                 
                 try {
-                    const response = await fetch(BRAIN_URL);
-                    const text = await response.text();
-                    const lines = text.split(/\r?\n/).map(l => l.trim());
+                    // Cache-busting fetch to get the LATEST version of your Google Doc
+                    const response = await fetch(BRAIN_URL + "?t=" + new Date().getTime());
+                    const html = await response.text();
+                    
+                    // Improved parsing for Google Doc 'Plain Text'
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const cleanText = temp.innerText || temp.textContent;
+                    const lines = cleanText.split(/\s+/).filter(l => l.length > 0);
                     
                     const ownerPass = lines[0];
                     const userPass = lines[1];
 
-                    if (pass === ownerPass) {
-                        setAuth('owner');
-                    } else if (pass === userPass) {
-                        setAuth('user');
-                    } else {
-                        document.getElementById('status').innerText = "ACCESS DENIED";
+                    if (val === ownerPass) { unlock('owner'); }
+                    else if (val === userPass) { unlock('user'); }
+                    else { 
+                        document.getElementById('status').innerText = "INVALID KEY"; 
                         input.value = "";
                     }
                 } catch (err) {
-                    document.getElementById('status').innerText = "BRAIN LINK ERROR";
+                    document.getElementById('status').innerText = "LINK ERROR";
                 }
             }
         });
 
-        function setAuth(role) {
+        function unlock(role) {
             localStorage.setItem('eclipse_auth', 'true');
             localStorage.setItem('eclipse_role', role);
-            unlock(role);
-        }
-
-        function unlock(role) {
-            lockScreen.style.opacity = '0';
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-                mainUI.style.visibility = 'visible';
-                if (role === 'owner') {
-                    document.getElementById('hrm-btn').style.display = 'block';
-                }
-                renderGames();
-                updateHitCount();
-            }, 500);
-        }
-
-        function renderGames() {
-            const container = document.getElementById('game-list');
-            container.innerHTML = GAMES.map(game => `
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'flex';
+            if (role === 'owner') document.getElementById('hrm-btn').style.display = 'block';
+            
+            // Render Games
+            document.getElementById('game-list').innerHTML = GAMES.map(g => `
                 <div class="game-card">
-                    <div class="game-icon" style="background-image: url('${game.icon}')"></div>
-                    <div class="game-name">${game.name}</div>
-                    <a href="${game.link}" class="dl-btn">DIRECT DOWNLOAD</a>
+                    <div class="game-icon" style="background-image:url('${g.icon}')"></div>
+                    <div class="game-name">${g.name}</div>
+                    <a href="${g.link}" class="dl-btn">DIRECT DOWNLOAD</a>
                 </div>
             `).join('');
         }
 
-        function showTab(tab) {
+        function showTab(t) {
             document.getElementById('dashboard-tab').classList.add('hidden');
             document.getElementById('hrm-tab').classList.add('hidden');
-            document.getElementById(tab + '-tab').classList.remove('hidden');
-        }
-
-        function updateHitCount() {
-            // Lazy counter: increment local count for visual feel
-            let hits = localStorage.getItem('eclipse_hits') || Math.floor(Math.random() * 20) + 5;
-            hitDisplay.innerText = hits;
-            localStorage.setItem('eclipse_hits', parseInt(hits) + 1);
-        }
-
-        function globalNuke() {
-            if(confirm("DANGER: This will clear your local access ticket. You must change the password in the Doc to block others.")) {
-                localStorage.clear();
-                location.reload();
-            }
+            document.getElementById(t + '-tab').classList.remove('hidden');
         }
     </script>
 </body>
