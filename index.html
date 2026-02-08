@@ -325,7 +325,7 @@
         let currentUser = '';
         let chatHistory = [];
 
-        // Login Function
+        // Login Function with Debug
         async function login() {
             const username = document.getElementById('usernameInput').value.trim();
             const password = document.getElementById('passwordInput').value;
@@ -344,8 +344,21 @@
                 const content = doc.body.textContent.trim();
                 const lines = content.split('\n').filter(line => line.trim());
 
+                // DEBUG - Show what we got from doc
+                console.log('Raw content:', content);
+                console.log('Lines array:', lines);
+                console.log('Line 0 (owner):', lines[0]);
+                console.log('Line 1 (customer):', lines[1]);
+
                 const ownerPass = lines[0]?.trim();
                 const customerPass = lines[1]?.trim();
+
+                // DEBUG - Show trimmed passwords
+                console.log('Owner password:', ownerPass);
+                console.log('Customer password:', customerPass);
+                console.log('Your entered password:', password);
+                console.log('Match owner?', password === ownerPass);
+                console.log('Match customer?', password === customerPass);
 
                 if (password === ownerPass) {
                     isOwner = true;
@@ -353,7 +366,6 @@
                     document.getElementById('hrmBtn').style.display = 'block';
                     startApp();
                 } else if (password === customerPass) {
-                    // Check if username already exists
                     const checkUsers = await fetch(SHEET_URL, {
                         method: 'POST',
                         body: JSON.stringify({action: 'getUsers'})
@@ -383,9 +395,9 @@
             
             if (isOwner) {
                 loadDashboard();
-                setInterval(loadDashboard, 30000); // Refresh every 30 seconds
+                setInterval(loadDashboard, 30000);
             } else {
-                setInterval(sendPing, 30000); // Ping every 30 seconds
+                setInterval(sendPing, 30000);
             }
         }
 
@@ -430,7 +442,7 @@
                 const now = new Date();
                 const activeUsers = users.filter(u => {
                     const lastActive = new Date(u[1]);
-                    return (now - lastActive) < 60000; // Active if pinged in last 60 seconds
+                    return (now - lastActive) < 60000;
                 });
 
                 document.getElementById('activeCount').textContent = activeUsers.length;
@@ -473,12 +485,10 @@
 
             const messagesDiv = document.getElementById('chatMessages');
             
-            // Add user message
             messagesDiv.innerHTML += `<div class="message user-message">${message}</div>`;
             input.value = '';
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-            // Build conversation history for Gemini
             chatHistory.push({
                 role: 'user',
                 parts: [{text: message}]
@@ -517,7 +527,6 @@
             }
         }
 
-        // Enter key to send message
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('chatInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') sendMessage();
