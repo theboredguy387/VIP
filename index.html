@@ -316,8 +316,8 @@
     </div>
 
     <script>
-        // Configuration
-        const DOC_URL = 'https://docs.google.com/document/d/e/2PACX-1vSt3ObNhMiXyle2tw1DTpEOqzTnlmfNdA4yTBTA_CXDoE8YACvuuDBsW4LfHMMSE1-ZOIEmV2r5I8qK/pub';
+        // Configuration - FIXED DOC URL
+        const DOC_URL = 'https://docs.google.com/document/d/1fFMiccdH2zcMh01cxzVbglMjqDJgsZlRRJvAbA5zdDs/export?format=txt';
         const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyb2_oZBbvwK6ugAYwczxD4cPCYEjHeSBhlTkW_6MziJ3Yo4USXiO86jW8iPV9i3izm/exec';
         const GEMINI_KEY = 'AIzaSyBNb7FVgIqxJucrxYEjPPUEroO1a2XXJ2E';
 
@@ -325,7 +325,7 @@
         let currentUser = '';
         let chatHistory = [];
 
-        // Login Function with Debug
+        // Login Function
         async function login() {
             const username = document.getElementById('usernameInput').value.trim();
             const password = document.getElementById('passwordInput').value;
@@ -339,26 +339,10 @@
             try {
                 const response = await fetch(DOC_URL);
                 const text = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
-                const content = doc.body.textContent.trim();
-                const lines = content.split('\n').filter(line => line.trim());
+                const lines = text.trim().split('\n').map(line => line.trim()).filter(line => line);
 
-                // DEBUG - Show what we got from doc
-                console.log('Raw content:', content);
-                console.log('Lines array:', lines);
-                console.log('Line 0 (owner):', lines[0]);
-                console.log('Line 1 (customer):', lines[1]);
-
-                const ownerPass = lines[0]?.trim();
-                const customerPass = lines[1]?.trim();
-
-                // DEBUG - Show trimmed passwords
-                console.log('Owner password:', ownerPass);
-                console.log('Customer password:', customerPass);
-                console.log('Your entered password:', password);
-                console.log('Match owner?', password === ownerPass);
-                console.log('Match customer?', password === customerPass);
+                const ownerPass = lines[0];
+                const customerPass = lines[1];
 
                 if (password === ownerPass) {
                     isOwner = true;
