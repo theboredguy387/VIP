@@ -335,8 +335,8 @@
         // Configuration
         const DOC_URL = 'https://docs.google.com/document/d/1fFMiccdH2zcMh01cxzVbglMjqDJgsZlRRJvAbA5zdDs/export?format=txt';
         const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyb2_oZBbvwK6ugAYwczxD4cPCYEjHeSBhlTkW_6MziJ3Yo4USXiO86jW8iPV9i3izm/exec';
-        const GEMINI_KEY = 'AIzaSyBNb7FVgIqxJucrxYEjPPUEroO1a2XXJ2E';
-
+        
+        let GEMINI_KEY = ''; // Will be loaded from Google Doc
         let isOwner = false;
         let currentUser = '';
         let chatHistory = [];
@@ -354,9 +354,22 @@
             }
         }
 
+        // Load API key from Google Doc
+        async function loadAPIKey() {
+            try {
+                const response = await fetch(DOC_URL);
+                const text = await response.text();
+                const lines = text.trim().split('\n').map(line => line.trim()).filter(line => line);
+                GEMINI_KEY = lines[2]; // Line 3 = API key
+            } catch (error) {
+                console.error('Could not load API key:', error);
+            }
+        }
+
         // Check for existing session on page load
         window.addEventListener('DOMContentLoaded', async () => {
             await getUserIP();
+            await loadAPIKey(); // Load the API key on startup
             
             const savedUser = sessionStorage.getItem('eclipseUser');
             const savedOwner = sessionStorage.getItem('eclipseOwner');
@@ -391,6 +404,7 @@
 
                 const ownerPass = lines[0];
                 const customerPass = lines[1];
+                GEMINI_KEY = lines[2]; // Update API key on login too
 
                 if (password === ownerPass) {
                     isOwner = true;
@@ -438,9 +452,9 @@
             
             if (isOwner) {
                 loadDashboard();
-                setInterval(loadDashboard, 10000); // Refresh every 10 seconds for owner
+                setInterval(loadDashboard, 10000);
             } else {
-                setInterval(sendPing, 30000); // Ping every 30 seconds
+                setInterval(sendPing, 30000);
             }
         }
 
@@ -485,7 +499,7 @@
                 const now = new Date();
                 const activeUsers = users.filter(u => {
                     const lastActive = new Date(u[1]);
-                    return (now - lastActive) < 90000; // Active if pinged in last 90 seconds
+                    return (now - lastActive) < 90000;
                 });
 
                 document.getElementById('activeCount').textContent = activeUsers.length;
@@ -582,3 +596,16 @@
     </script>
 </body>
 </html>
+```
+
+**What changed:**
+- ✅ GEMINI_KEY is NO LONGER hardcoded
+- ✅ It loads from Line 3 of your Google Doc
+- ✅ Loads on page startup AND on login
+- ✅ You can change it anytime from school by editing the doc
+
+**Your Google Doc should have:**
+```
+Line 1: owner password
+Line 2: customer password
+Line 3: gemini api key
