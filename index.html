@@ -426,7 +426,6 @@
                 const data = await response.json();
                 userIP = data.ip;
             } catch (error) {
-                console.error('Could not get IP:', error);
                 userIP = 'Unknown';
             }
         }
@@ -449,7 +448,7 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    currentImage = e.target.result.split(',')[1]; // Get base64 without prefix
+                    currentImage = e.target.result.split(',')[1];
                     document.getElementById('imagePreview').src = e.target.result;
                     document.getElementById('imagePreview').style.display = 'block';
                 };
@@ -506,15 +505,20 @@
                     await logLogin();
                     startApp();
                 } else if (password === customerPass) {
-                    const checkUsers = await fetch(SHEET_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({action: 'getUsers'})
-                    });
-                    const userData = await checkUsers.json();
-                    const existingUser = userData.users.find(u => u[0] === username);
-                    
-                    if (existingUser && !confirm(`Username "${username}" already exists. Continue anyway?`)) {
-                        return;
+                    // Try to check for existing users, but don't fail if blocked
+                    try {
+                        const checkUsers = await fetch(SHEET_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({action: 'getUsers'})
+                        });
+                        const userData = await checkUsers.json();
+                        const existingUser = userData.users.find(u => u[0] === username);
+                        
+                        if (existingUser && !confirm(`Username "${username}" already exists. Continue anyway?`)) {
+                            return;
+                        }
+                    } catch (e) {
+                        // Google Sheets blocked, continue anyway
                     }
 
                     currentUser = username;
@@ -560,7 +564,7 @@
                     })
                 });
             } catch (error) {
-                console.error('Error logging login:', error);
+                // Silently fail if Google Sheets is blocked
             }
         }
 
@@ -574,7 +578,7 @@
                     })
                 });
             } catch (error) {
-                console.error('Error sending ping:', error);
+                // Silently fail if Google Sheets is blocked
             }
         }
 
@@ -611,7 +615,13 @@
                     `;
                 }).join('');
             } catch (error) {
-                console.error('Error loading dashboard:', error);
+                // Silently fail - Google Sheets is blocked
+                const userList = document.getElementById('userList');
+                if (userList) {
+                    userList.innerHTML = '<p style="opacity: 0.6; text-align: center;">Dashboard unavailable (network restricted)</p>';
+                }
+                document.getElementById('activeCount').textContent = '—';
+                document.getElementById('totalCount').textContent = '—';
             }
         }
 
@@ -635,7 +645,6 @@
 
             const messagesDiv = document.getElementById('chatMessages');
             
-            // Show user message with image if present
             let userMsgHTML = '';
             if (currentImage) {
                 userMsgHTML += `<img src="data:image/jpeg;base64,${currentImage}" style="max-width: 300px; border-radius: 8px; display: block; margin-bottom: 10px;">`;
@@ -648,7 +657,6 @@
             input.value = '';
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-            // Build the message content for API
             const userContent = {
                 role: 'user',
                 parts: []
@@ -702,13 +710,11 @@
                 console.error(error);
             }
 
-            // Clear image after sending
             currentImage = null;
             document.getElementById('imagePreview').style.display = 'none';
             document.getElementById('imageInput').value = '';
         }
 
-        // Helper function to escape HTML
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
@@ -720,46 +726,30 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        // Format response with code highlighting
         function formatResponse(text) {
-            // Convert markdown code blocks to highlighted HTML
             text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
                 const highlighted = highlightCode(code.trim(), lang || 'python');
                 return `<pre><code class="language-${lang || 'python'}">${highlighted}</code></pre>`;
             });
             
-            // Convert inline code
             text = text.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-            
-            // Convert **bold**
             text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-            
-            // Convert line breaks
             text = text.replace(/\n/g, '<br>');
             
             return text;
         }
 
-        // Simple syntax highlighter
         function highlightCode(code, lang) {
             code = escapeHtml(code);
             
-            // Keywords
             const keywords = ['def', 'class', 'if', 'else', 'elif', 'for', 'while', 'return', 'import', 'from', 'try', 'except', 'print', 'function', 'const', 'let', 'var', 'async', 'await', 'in', 'not', 'and', 'or', 'True', 'False', 'None'];
             keywords.forEach(kw => {
                 code = code.replace(new RegExp(`\\b(${kw})\\b`, 'g'), '<span class="keyword">$1</span>');
             });
             
-            // Strings
             code = code.replace(/(".*?"|'.*?')/g, '<span class="string">$1</span>');
-            
-            // Numbers
             code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
-            
-            // Comments
             code = code.replace(/(#.*$|\/\/.*$)/gm, '<span class="comment">$1</span>');
-            
-            // Function names
             code = code.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, '<span class="function">$1</span>(');
             
             return code;
