@@ -123,6 +123,10 @@
             gap: 20px;
         }
 
+        .game-card.hidden {
+            display: none;
+        }
+
         .game-icon {
             width: 80px;
             height: 80px;
@@ -347,7 +351,7 @@
     <div id="loginScreen">
         <img src="logo.png" alt="Eclipse Logo">
         <h1>Eclipse</h1>
-        <input type="text" id="usernameInput" placeholder="Username">
+        <input type="text" id="usernameInput" placeholder="Username (leave blank if owner)">
         <input type="password" id="passwordInput" placeholder="Password">
         <button onclick="login()">Login</button>
         <p id="errorMsg"></p>
@@ -367,7 +371,9 @@
             <!-- Games Page -->
             <div id="gamesPage" class="page active">
                 <h1>Games Library</h1>
-                <div class="game-card">
+                
+                <!-- Game cards will be shown/hidden based on user access -->
+                <div class="game-card" data-game="GD">
                     <img src="https://img.icons8.com/color/96/geometry-dash.png" alt="GD Icon" class="game-icon">
                     <div class="game-info">
                         <h3>Geometry Dash</h3>
@@ -375,6 +381,18 @@
                     </div>
                     <button class="download-btn" onclick="downloadGame('https://onedrive.live.com/personal/0f96dd6e92bc1a64/_layouts/15/download.aspx?SourceUrl=%2Fpersonal%2F0f96dd6e92bc1a64%2FDocuments%2FGD%5F2%2E2074%5Fwindows%5Fvanilla%2Ezip')">Download</button>
                 </div>
+
+                <!-- Add more games here with data-game attribute -->
+                <!-- Example:
+                <div class="game-card" data-game="Minecraft">
+                    <img src="minecraft-icon.png" alt="Minecraft Icon" class="game-icon">
+                    <div class="game-info">
+                        <h3>Minecraft</h3>
+                        <p>Sandbox building game</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadGame('MINECRAFT_DOWNLOAD_URL')">Download</button>
+                </div>
+                -->
             </div>
 
             <!-- AI Page -->
@@ -412,10 +430,11 @@
         const DOC_URL = 'https://docs.google.com/document/d/1fFMiccdH2zcMh01cxzVbglMjqDJgsZlRRJvAbA5zdDs/export?format=txt';
         const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyb2_oZBbvwK6ugAYwczxD4cPCYEjHeSBhlTkW_6MziJ3Yo4USXiO86jW8iPV9i3izm/exec';
         
-        let GEMINI_KEYS = []; // Array of all API keys
+        let GEMINI_KEYS = [];
         let currentKeyIndex = 0;
         let isOwner = false;
         let currentUser = '';
+        let allowedGames = [];
         let chatHistory = [];
         let userIP = 'Unknown';
         let currentImage = null;
@@ -438,10 +457,8 @@
                 const text = await response.text();
                 const lines = text.trim().split('\n').map(line => line.trim()).filter(line => line);
                 
-                // Lines 2 onwards are API keys (Line 0 = owner pass, Line 1 = customer pass)
-                GEMINI_KEYS = lines.slice(2).filter(key => key.startsWith('AIza'));
-                
-                // Shuffle keys for random distribution
+                // Lines 1-42 are API keys (Line 0 = owner pass)
+                GEMINI_KEYS = lines.slice(1, 43).filter(key => key.startsWith('AIza'));
                 GEMINI_KEYS = GEMINI_KEYS.sort(() => Math.random() - 0.5);
                 
                 console.log(`Loaded ${GEMINI_KEYS.length} API keys`);
@@ -453,11 +470,8 @@
         // Get a random API key
         function getAPIKey() {
             if (GEMINI_KEYS.length === 0) return '';
-            
-            // Round-robin through keys
             const key = GEMINI_KEYS[currentKeyIndex];
             currentKeyIndex = (currentKeyIndex + 1) % GEMINI_KEYS.length;
-            
             return key;
         }
 
@@ -475,6 +489,21 @@
             }
         }
 
+        // Show/hide games based on user access
+        function updateGameAccess() {
+            const gameCards = document.querySelectorAll('.game-card[data-game]');
+            
+            gameCards.forEach(card => {
+                const gameName = card.getAttribute('data-game');
+                
+                if (isOwner || allowedGames.includes(gameName)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
         // Check for existing session on page load
         window.addEventListener('DOMContentLoaded', async () => {
             await getUserIP();
@@ -482,27 +511,30 @@
             
             const savedUser = sessionStorage.getItem('eclipseUser');
             const savedOwner = sessionStorage.getItem('eclipseOwner');
+            const savedGames = sessionStorage.getItem('eclipseGames');
             
             if (savedUser) {
                 currentUser = savedUser;
                 isOwner = savedOwner === 'true';
+                allowedGames = savedGames ? savedGames.split(',') : [];
                 
                 if (isOwner) {
                     document.getElementById('hrmBtn').style.display = 'block';
                 }
                 
+                updateGameAccess();
                 startApp();
             }
         });
 
         // Login Function
         async function login() {
-            const username = document.getElementById('usernameInput').value.trim();
+            let username = document.getElementById('usernameInput').value.trim();
             const password = document.getElementById('passwordInput').value;
             const errorMsg = document.getElementById('errorMsg');
 
-            if (!username || !password) {
-                errorMsg.textContent = 'Please enter both username and password';
+            if (!password) {
+                errorMsg.textContent = 'Please enter a password';
                 return;
             }
 
@@ -512,44 +544,74 @@
                 const lines = text.trim().split('\n').map(line => line.trim()).filter(line => line);
 
                 const ownerPass = lines[0];
-                const customerPass = lines[1];
                 
                 // Load API keys
-                GEMINI_KEYS = lines.slice(2).filter(key => key.startsWith('AIza'));
+                GEMINI_KEYS = lines.slice(1, 43).filter(key => key.startsWith('AIza'));
                 GEMINI_KEYS = GEMINI_KEYS.sort(() => Math.random() - 0.5);
 
+                // Check if owner (blank username OR password matches owner password)
                 if (password === ownerPass) {
                     isOwner = true;
-                    currentUser = username;
-                    sessionStorage.setItem('eclipseUser', username);
+                    currentUser = username || 'Owner';
+                    allowedGames = ['ALL']; // Owner has access to all games
+                    
+                    sessionStorage.setItem('eclipseUser', currentUser);
                     sessionStorage.setItem('eclipseOwner', 'true');
+                    sessionStorage.setItem('eclipseGames', 'ALL');
+                    
                     document.getElementById('hrmBtn').style.display = 'block';
                     await logLogin();
+                    updateGameAccess();
                     startApp();
-                } else if (password === customerPass) {
-                    try {
-                        const checkUsers = await fetch(SHEET_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({action: 'getUsers'})
-                        });
-                        const userData = await checkUsers.json();
-                        const existingUser = userData.users.find(u => u[0] === username);
-                        
-                        if (existingUser && !confirm(`Username "${username}" already exists. Continue anyway?`)) {
-                            return;
-                        }
-                    } catch (e) {
-                        // Google Sheets blocked, continue anyway
-                    }
-
-                    currentUser = username;
-                    sessionStorage.setItem('eclipseUser', username);
-                    sessionStorage.setItem('eclipseOwner', 'false');
-                    await logLogin();
-                    startApp();
-                } else {
-                    errorMsg.textContent = 'Invalid password';
+                    return;
                 }
+
+                // Check customer credentials (lines 43+)
+                // Format: username:password:game1,game2,game3
+                const userLines = lines.slice(43);
+                let found = false;
+
+                for (const line of userLines) {
+                    const parts = line.split(':');
+                    if (parts.length >= 3) {
+                        const [lineUser, linePass, games] = parts;
+                        
+                        if (lineUser === username && linePass === password) {
+                            found = true;
+                            currentUser = username;
+                            allowedGames = games.split(',').map(g => g.trim());
+                            
+                            sessionStorage.setItem('eclipseUser', currentUser);
+                            sessionStorage.setItem('eclipseOwner', 'false');
+                            sessionStorage.setItem('eclipseGames', allowedGames.join(','));
+                            
+                            try {
+                                const checkUsers = await fetch(SHEET_URL, {
+                                    method: 'POST',
+                                    body: JSON.stringify({action: 'getUsers'})
+                                });
+                                const userData = await checkUsers.json();
+                                const existingUser = userData.users.find(u => u[0] === username);
+                                
+                                if (existingUser && !confirm(`Username "${username}" already exists. Continue anyway?`)) {
+                                    return;
+                                }
+                            } catch (e) {
+                                // Google Sheets blocked, continue anyway
+                            }
+
+                            await logLogin();
+                            updateGameAccess();
+                            startApp();
+                            break;
+                        }
+                    }
+                }
+
+                if (!found) {
+                    errorMsg.textContent = 'Invalid username or password';
+                }
+
             } catch (error) {
                 errorMsg.textContent = 'Error connecting. Please try again.';
                 console.error(error);
@@ -559,6 +621,7 @@
         function logout() {
             sessionStorage.removeItem('eclipseUser');
             sessionStorage.removeItem('eclipseOwner');
+            sessionStorage.removeItem('eclipseGames');
             location.reload();
         }
 
@@ -697,10 +760,9 @@
 
             chatHistory.push(userContent);
 
-            // Try with multiple API keys if one fails
             let success = false;
             let attempts = 0;
-            const maxAttempts = Math.min(5, GEMINI_KEYS.length); // Try up to 5 different keys
+            const maxAttempts = Math.min(5, GEMINI_KEYS.length);
 
             while (!success && attempts < maxAttempts) {
                 const apiKey = getAPIKey();
@@ -731,7 +793,6 @@
                         messagesDiv.innerHTML += `<div class="message ai-message">${formattedResponse}</div>`;
                         success = true;
                     } else if (data.error) {
-                        // If rate limit or other error, try next key
                         console.log(`Key failed: ${data.error.message}, trying next key...`);
                         continue;
                     }
